@@ -134,13 +134,159 @@ This file contains the game's front-end logic, including:
             <button id="continueBtn">Continue</button>
             <button id="stopBtn">Stop</button>
         </div>
-        <script>
-            // JavaScript for game logic, including:
-            // - Ball movement
-            // - Paddle controls
-            // - Timer countdown
-            // - Collision detection
-        </script>
+    <script>
+        const canvas = document.getElementById('pongCanvas'); // Get the canvas element
+        const ctx = canvas.getContext('2d'); // Get the 2D drawing context for the canvas
+        canvas.width = 800; // Set canvas width
+        canvas.height = 600; // Set canvas height
+
+        // Game state variables
+        let isRunning = true; // Indicates if the game is running
+        let playerScore = 0; // Tracks player's score
+        let aiScore = 0; // Tracks AI's score
+        let timeLeft = 60; // Timer for the game
+
+        // Ball properties
+        const ball = {
+            x: canvas.width / 2, // Ball's initial X position (center)
+            y: canvas.height / 2, // Ball's initial Y position (center)
+            radius: 10, // Ball's radius
+            dx: 4, // Ball's horizontal speed
+            dy: 4 // Ball's vertical speed
+        };
+
+        // Paddle properties
+        const paddleWidth = 10; // Paddle width
+        const paddleHeight = 100; // Paddle height
+        const player = { x: 0, y: canvas.height / 2 - paddleHeight / 2, dy: 0 }; // Player's paddle properties
+        const ai = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2 }; // AI's paddle properties
+
+        // Timer function
+        function startTimer() {
+            const timer = setInterval(() => {
+                if (!isRunning || timeLeft <= 0) { // Stop timer if game is not running or time is up
+                    clearInterval(timer); // Clear the timer
+                    isRunning = false; // Stop the game
+                    alert('Game Over! Final Score: Player ' + playerScore + ' - AI ' + aiScore); // Display final score
+                } else {
+                    timeLeft--; // Decrease time
+                    document.getElementById('timer').textContent = timeLeft; // Update timer display
+                }
+            }, 1000); // Timer interval (1 second)
+        }
+
+        // Draw the ball on the canvas
+        function drawBall() {
+            ctx.beginPath(); // Start drawing path
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2); // Draw a circle for the ball
+            ctx.fillStyle = '#fff'; // Set ball color to white
+            ctx.fill(); // Fill the ball
+            ctx.closePath(); // End drawing path
+        }
+
+        // Draw a paddle on the canvas
+        function drawPaddle(x, y) {
+            ctx.fillStyle = '#fff'; // Set paddle color to white
+            ctx.fillRect(x, y, paddleWidth, paddleHeight); // Draw paddle rectangle
+        }
+
+        // Move the ball
+        function moveBall() {
+            ball.x += ball.dx; // Update ball's X position
+            ball.y += ball.dy; // Update ball's Y position
+
+            // Bounce on top/bottom edges
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.dy *= -1; // Reverse vertical direction
+            }
+
+            // Bounce on paddles
+            if (
+                (ball.x - ball.radius < player.x + paddleWidth && ball.y > player.y && ball.y < player.y + paddleHeight) ||
+                (ball.x + ball.radius > ai.x && ball.y > ai.y && ball.y < ai.y + paddleHeight)
+            ) {
+                ball.dx *= -1; // Reverse horizontal direction
+            }
+
+            // Score logic
+            if (ball.x - ball.radius < 0) { // Ball goes past player paddle
+                aiScore++; // Increment AI score
+                resetBall(); // Reset ball position
+            } else if (ball.x + ball.radius > canvas.width) { // Ball goes past AI paddle
+                playerScore++; // Increment player score
+                resetBall(); // Reset ball position
+            }
+
+            // Update score display
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('aiScore').textContent = aiScore;
+        }
+
+        // Reset ball to the center
+        function resetBall() {
+            ball.x = canvas.width / 2; // Reset X position
+            ball.y = canvas.height / 2; // Reset Y position
+            ball.dx *= -1; // Reverse horizontal direction
+        }
+
+        // Move player's paddle
+        function movePlayer() {
+            player.y += player.dy; // Update player's Y position
+            if (player.y < 0) player.y = 0; // Prevent paddle from going above canvas
+            if (player.y + paddleHeight > canvas.height) player.y = canvas.height - paddleHeight; // Prevent paddle from going below canvas
+        }
+
+        // Move AI's paddle
+        function moveAI() {
+            if (ball.y < ai.y + paddleHeight / 2) ai.y -= 3; // Move AI paddle up
+            if (ball.y > ai.y + paddleHeight / 2) ai.y += 3; // Move AI paddle down
+            if (ai.y < 0) ai.y = 0; // Prevent AI paddle from going above canvas
+            if (ai.y + paddleHeight > canvas.height) ai.y = canvas.height - paddleHeight; // Prevent AI paddle from going below canvas
+        }
+
+        // Game loop to update and render the game
+        function gameLoop() {
+            if (isRunning) { // Continue only if the game is running
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+                drawBall(); // Draw the ball
+                drawPaddle(player.x, player.y); // Draw player's paddle
+                drawPaddle(ai.x, ai.y); // Draw AI's paddle
+
+                moveBall(); // Update ball position
+                movePlayer(); // Update player's paddle position
+                moveAI(); // Update AI's paddle position
+
+                requestAnimationFrame(gameLoop); // Call gameLoop recursively for the next frame
+            }
+        }
+
+        // Control player's paddle with keyboard
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') player.dy = -5; // Move paddle up
+            if (e.key === 'ArrowDown') player.dy = 5; // Move paddle down
+        });
+
+        window.addEventListener('keyup', () => {
+            player.dy = 0; // Stop paddle movement
+        });
+
+        // Buttons to control the game
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            if (!isRunning) { // Continue only if the game is not running
+                isRunning = true; // Resume the game
+                gameLoop(); // Start the game loop
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            isRunning = false; // Stop the game
+        });
+
+        // Start the game and timer
+        gameLoop(); // Begin the game loop
+        startTimer(); // Begin the timer
+    </script>
     </body>
     </html>
     ```
