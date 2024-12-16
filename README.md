@@ -42,7 +42,7 @@ Pong-Game/
 ### Step 1: Clone the Repository
 
 ```
-git clone https://github.com/your-repo/Pong-Game.git
+git clone https://github.com/sugeng-riyanto/pong-game-using-flask-python.git
 cd Pong-Game
 ```
 
