@@ -7,7 +7,7 @@ This project is a simple Pong game implemented using HTML, JavaScript, and Flask
 
 ## Project Structure
 
-```git
+```bash
 Pong-Game/
 |-- static/
 |   |-- index.html
