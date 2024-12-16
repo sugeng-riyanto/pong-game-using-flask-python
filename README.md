@@ -50,7 +50,7 @@ cd Pong-Game
 
 Install Flask using pip:
 
-```
+```bash
 pip install flask
 ```
 
@@ -58,13 +58,13 @@ pip install flask
 
 Run the following command to start the Flask server:
 
-```git
+```bash
 python app.py
 ```
 
 The application will be hosted locally at:
 
-```
+```bash
 http://0.0.0.0:8080
 ```
 
