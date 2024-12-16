@@ -10,7 +10,7 @@ This project is a simple Pong game implemented using HTML, JavaScript, and Flask
 ```bash
 Pong-Game/
 |-- static/
-|   |-- index.html
+|   |-- 
 |-- templates/
 |   |-- index.html
 |-- app.py
