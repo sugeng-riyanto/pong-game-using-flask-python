@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; text-align: center; background-color: #000; color: #fff; }
+        canvas { display: block; margin: 20px auto; background: #111; }
+        #controls { margin-top: 10px; }
+        button { margin: 5px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Pong Game</h1>
+    <div id="info">
+        <p>Time Left: <span id="timer">60</span> seconds</p>
+        <p>Player Score: <span id="playerScore">0</span> | AI Score: <span id="aiScore">0</span></p>
+    </div>
+    <canvas id="pongCanvas"></canvas>
+    <div id="controls">
+        <button id="continueBtn">Continue</button>
+        <button id="stopBtn">Stop</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('pongCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Game state variables
+        let isRunning = true;
+        let playerScore = 0;
+        let aiScore = 0;
+        let timeLeft = 60;
+
+        // Ball properties
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            dx: 4,
+            dy: 4
+        };
+
+        // Paddle properties
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const player = { x: 0, y: canvas.height / 2 - paddleHeight / 2, dy: 0 };
+        const ai = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2 };
+
+        // Timer function
+        function startTimer() {
+            const timer = setInterval(() => {
+                if (!isRunning || timeLeft <= 0) {
+                    clearInterval(timer);
+                    isRunning = false;
+                    alert('Game Over! Final Score: Player ' + playerScore + ' - AI ' + aiScore);
+                } else {
+                    timeLeft--;
+                    document.getElementById('timer').textContent = timeLeft;
+                }
+            }, 1000);
+        }
+
+        // Draw ball
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Draw paddles
+        function drawPaddle(x, y) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x, y, paddleWidth, paddleHeight);
+        }
+
+        // Move ball
+        function moveBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Bounce on top/bottom edges
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.dy *= -1;
+            }
+
+            // Bounce on paddles
+            if (
+                (ball.x - ball.radius < player.x + paddleWidth && ball.y > player.y && ball.y < player.y + paddleHeight) ||
+                (ball.x + ball.radius > ai.x && ball.y > ai.y && ball.y < ai.y + paddleHeight)
+            ) {
+                ball.dx *= -1;
+            }
+
+            // Score logic
+            if (ball.x - ball.radius < 0) {
+                aiScore++;
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
+                playerScore++;
+                resetBall();
+            }
+
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('aiScore').textContent = aiScore;
+        }
+
+        // Reset ball to the center
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx *= -1;
+        }
+
+        // Move player's paddle
+        function movePlayer() {
+            player.y += player.dy;
+            if (player.y < 0) player.y = 0;
+            if (player.y + paddleHeight > canvas.height) player.y = canvas.height - paddleHeight;
+        }
+
+        // AI paddle movement
+        function moveAI() {
+            if (ball.y < ai.y + paddleHeight / 2) ai.y -= 3;
+            if (ball.y > ai.y + paddleHeight / 2) ai.y += 3;
+            if (ai.y < 0) ai.y = 0;
+            if (ai.y + paddleHeight > canvas.height) ai.y = canvas.height - paddleHeight;
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (isRunning) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                drawBall();
+                drawPaddle(player.x, player.y);
+                drawPaddle(ai.x, ai.y);
+
+                moveBall();
+                movePlayer();
+                moveAI();
+
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Control player's paddle
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') player.dy = -5;
+            if (e.key === 'ArrowDown') player.dy = 5;
+        });
+
+        window.addEventListener('keyup', () => {
+            player.dy = 0;
+        });
+
+        // Buttons for controlling the game
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            if (!isRunning) {
+                isRunning = true;
+                gameLoop();
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            isRunning = false;
+        });
+
+        // Start the game and timer
+        gameLoop();
+        startTimer();
+    </script>
+</body>
+</html>
