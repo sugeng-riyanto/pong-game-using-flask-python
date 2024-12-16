@@ -1,4 +1,5 @@
-﻿# pong-game-using-flask-python
+
+# Pong Game with Flask
 
 This project is a simple Pong game implemented using HTML, JavaScript, and Flask. It is designed to demonstrate basic web development concepts such as canvas manipulation, event handling, and server-side routing.
 
@@ -6,7 +7,7 @@ This project is a simple Pong game implemented using HTML, JavaScript, and Flask
 
 ## Project Structure
 
-```
+```git
 Pong-Game/
 |-- static/
 |   |-- index.html
@@ -57,7 +58,7 @@ pip install flask
 
 Run the following command to start the Flask server:
 
-```
+```git
 python app.py
 ```
 
@@ -108,7 +109,7 @@ This file contains the game's front-end logic, including:
 
 -   **HTML Structure**:
     
-    ```
+    ```html
     <!DOCTYPE html> <!-- Declares the document type -->
     <html lang="en"> <!-- Sets the language to English -->
     <head> <!-- Contains metadata and styles -->
@@ -151,19 +152,19 @@ This file serves the HTML page using Flask.
 
 -   **Imports**:
     
-    ```
+    ```python
     from flask import Flask, render_template # Flask to create the server, render_template to serve HTML
     ```
     
 -   **Flask Application Setup**:
     
-    ```
+    ```python
     app = Flask(__name__) # Initialize Flask app
     ```
     
 -   **Route Definition**:
     
-    ```
+    ```python
     @app.route("/") # Define the home route
     def index():
         return render_template("index.html") # Render the game page
@@ -171,7 +172,7 @@ This file serves the HTML page using Flask.
     
 -   **Run the Application**:
     
-    ```
+    ```python
     if __name__ == "__main__":
         app.run('0.0.0.0',8080) # Run Flask app on specified port
     ```
